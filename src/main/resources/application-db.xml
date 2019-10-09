@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+
+    <bean id="datasourcePool" abstract="true" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="clone">
+        <property name="initialSize" value="${druid.initialSize}" />
+        <property name="minIdle" value="${druid.minIdle}" />
+        <property name="maxActive" value="${druid.maxActive}" />
+        <property name="maxWait" value="${druid.maxWait}" />
+        <property name="timeBetweenEvictionRunsMillis" value="${druid.timeBetweenEvictionRunsMillis}" />
+        <property name="minEvictableIdleTimeMillis" value="${druid.minEvictableIdleTimeMillis}" />
+        <property name="validationQuery" value="${druid.validationQuery}" />
+        <property name="testWhileIdle" value="${druid.testWhileIdle}" />
+        <property name="testOnBorrow" value="${druid.testOnBorrow}" />
+        <property name="testOnReturn" value="${druid.testOnReturn}" />
+        <property name="poolPreparedStatements" value="${druid.poolPreparedStatements}" />
+        <property name="maxPoolPreparedStatementPerConnectionSize" value="${druid.maxPoolPreparedStatementPerConnectionSize}" />
+        <property name="filters" value="${druid.filters}" />
+    </bean>
+
+    <bean id="dataSource" parent="datasourcePool">
+        <property name="driverClassName" value="${db2019.mysql.jdbc.driverClassName}" />
+        <property name="url" value="${db2019.mysql.jdbc.url}" />
+        <property name="username" value="${db2019.mysql.jdbc.username}" />
+        <property name="password" value="${db2019.mysql.jdbc.password}" />
+    </bean>
+
+    <bean id="dataSource2018" parent="datasourcePool">
+        <property name="driverClassName" value="${db2018.mysql.jdbc.driverClassName}" />
+        <property name="url" value="${db2018.mysql.jdbc.url}" />
+        <property name="username" value="${db2018.mysql.jdbc.username}" />
+        <property name="password" value="${db2018.mysql.jdbc.password}" />
+    </bean>
+
+    <bean id="dynamicDataSource" class="javax.core.common.jdbc.datasource.DynamicDataSource" >
+        <property name="dataSourceEntry" ref="dynamicDataSourceEntry"></property>
+        <property name="targetDataSources">
+            <map>
+                <entry key="DB_2019" value-ref="dataSource"></entry>
+                <entry key="DB_2018" value-ref="dataSource2018"></entry>
+            </map>
+        </property>
+        <property name="defaultTargetDataSource" ref="dataSource" />
+    </bean>
+</beans>
